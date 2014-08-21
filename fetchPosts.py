@@ -9,8 +9,6 @@ from datetime import timedelta, datetime
 from time import sleep
 import random as rand
 
-import fetchPosts
-
 app = Flask("Crushes")
 mongo = PyMongo(app)
 
@@ -78,5 +76,3 @@ def curate_posts():
 			else: 
 				mongo.db.posts.insert(map(proc,posts))
 				cond = False
-
-curate_posts()
