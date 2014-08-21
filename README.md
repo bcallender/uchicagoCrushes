@@ -1,6 +1,6 @@
 ## Super quick and dirty API for UChicago Crushes that allows searching. 
 
-	Create a python virtualenv in the directory with `virtualenv env`. Then run `source env/bin/activate` then `pip install -r req.txt` to install requirements. 
+	Create a python virtualenv in the directory with `virtualenv env`. Then run `source env/bin/activate` then `pip install -r requirements.txt` to install requirements. 
 	
 	Run python setup_db.py to create the appropriate indices and fetch the latest from uchicago crushes. Make sure your mongodb is installed and running on the default port!
 
