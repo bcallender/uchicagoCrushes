@@ -10,9 +10,9 @@ Endpoint is localhost:5000/api/v1/posts
 	paginated search: localhost:5000/api/v1/posts?search=Love&page=4
 
 Next features:
-	-...a front end
-	-currently the text search is only active on the post message itself, next up is adding a text cursor to the comment section, as often thats where names are mentioned.
-	-update with changes in uchicago crushes. currently is one use only, need to implement updating
-		-related: fix fetchposts so doesn't end in error...
-	-caching so every req doesn't hit mongo. 
-	-auto-suggest recent searches with redis?
+	- ...a front end
+	- currently the text search is only active on the post message itself, next up is adding a text cursor to the comment section, as often thats where names are mentioned.
+	- update with changes in uchicago crushes. currently is one use only, need to implement updating
+		- related: fix fetchposts so doesn't end in error...
+	- caching so every req doesn't hit mongo. 
+	- auto-suggest recent searches with redis?
