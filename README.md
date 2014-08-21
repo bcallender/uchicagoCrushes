@@ -20,3 +20,6 @@
 	4. caching so every req doesn't hit mongo. 
 	5. auto-suggest recent searches with redis?
 	6. single post API with live fetching of likes and comments from fb
+	7. support for the existing hashtag system/linking to old posts based on uchicago crush id, or hashtag
+	8. fb login and interaction (commenting, liking)
+	9. scoring system

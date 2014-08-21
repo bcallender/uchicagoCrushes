@@ -79,7 +79,8 @@ api.representations = DEFAULT_REPRESENTATIONS
 #posts_collection = mongo.db.posts
 
 
-		
+def marshalPosts(posts, res, pg):
+	return [{'posts':posts}, {'total_results': res}, {'page': pg}]
 
 
 class PostsListAPI(Resource):
@@ -94,18 +95,22 @@ class PostsListAPI(Resource):
 		if args['page'] and args['search']:
 			rescount = mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
 			posts = list(mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
-			return [{'posts':posts}, {'total_results': rescount}, {'page': args['page']}]
+			page = args['page']
+			return marshalPosts(posts, rescount, page)
 		if args['page']:
 			rescount = mongo.db.posts.find().count()
 			posts = list(mongo.db.posts.find().limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
-			return [{'posts':posts}, {'total_results': rescount}, {'page': args['page']}]
+			page = args['page']
+			return marshalPosts(posts, rescount, page)
 		elif args['search']:
 			rescount = mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
-			posts = list(mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).sort([('created', -1)]))
-			return [{'posts':posts}, {'total_results': rescount}, {'page': 1}]
+			posts = list(mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).sort([('created',-1)]))
+			return marshalPosts(posts, rescount, 1)
 		else:
-			posts = list(mongo.db.posts.find().limit(25))
-			return {'posts':posts}
+			rescount = mongo.db.posts.find().count()
+			posts = list(mongo.db.posts.find().limit(25).sort([('created',-1)]))
+			return marshalPosts(posts, rescount, 1)
+			
 
 
 		
