@@ -2,6 +2,8 @@ Super quick and dirty API for UChicago Crushes that allows searching.
 
 Run python setup_db.py to create the appropriate indices and fetch the latest from uchicago crushes. Make sure your mongodb is installed and running on the default port!
 
+Create a python virtualenv in the directory with 'virtualenv env'. Then run 'source env/bin/activate' then 'pip install -r req.txt' to install requirements. 
+
 Endpoint is localhost:5000/api/v1/posts
 	pagination: localhost:5000/api/v1/posts?page=1
 	search: localhost:5000/api/v1/posts?search=Love
