@@ -18,3 +18,4 @@
 		* related: fix fetchposts so doesn't end in error...
 	4. caching so every req doesn't hit mongo. 
 	5. auto-suggest recent searches with redis?
+	6. single post API with live fetching of likes and comments from fb

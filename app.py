@@ -110,16 +110,16 @@ class PostsListAPI(Resource):
 
 		
 
-# class TaskAPI(Resource) :
+# class PostAPI(Resource) :
 # 	#decorators = [auth.login_required]
 
 #  	def __init__(self):
-# 		super(TaskAPI, self).__init__()
+# 		super(Post, self).__init__()
 # 	def get(self, id):
-# 		task = mongo.db.tasks.find_one({"_id": ObjectId(id)})
-# 		if not task :
+# 		post = mongo.db.posts.find_one({"_id": ObjectId(id)})
+# 		if not post :
 # 			abort(404)
-# 		return { 'task' : task}
+# 		return { 'post' : post}
 
 api.add_resource(PostsListAPI, '/api/v1/posts', endpoint = 'posts')
 # api.add_resource(PostAPI, '/api/v1/posts/<id>', endpoint = 'post')
