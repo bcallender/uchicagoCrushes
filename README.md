@@ -4,6 +4,8 @@
 
 	Create a python virtualenv in the directory with `virtualenv env`. Then run `source env/bin/activate` then `pip install -r req.txt` to install requirements. 
 
+	Start the application by running python app.py!
+
 ##Endpoint is localhost:5000/api/v1/posts
 	1. pagination: localhost:5000/api/v1/posts?page=1
 	2. search: localhost:5000/api/v1/posts?search=Love
