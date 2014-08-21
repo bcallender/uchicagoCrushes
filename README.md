@@ -13,7 +13,8 @@
 
 ##Next features:
 	1. ...a front end
-	2. currently the text search is only active on the post message itself, next up is adding a text cursor to the comment section, as often thats where names are mentioned.
+	2. currently the text search is only active on the post message itself, next up is adding 
+	a text cursor to the comment section, as often thats where names are mentioned.
 	3. update with changes in uchicago crushes. currently is one use only, need to implement updating
 		* related: fix fetchposts so doesn't end in error...
 	4. caching so every req doesn't hit mongo. 
