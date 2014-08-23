@@ -4,7 +4,7 @@
 	
 	Run python setup_db.py to create the appropriate indices and fetch the latest from uchicago crushes. Make sure your mongodb is installed and running on the default port!
 
-	Start the application by running python app.py!
+	Start the application by running foreman start (or python app.py if you dont have foreman)!
 
 ##Endpoint is localhost:5000/api/v1/posts
 	1. pagination: localhost:5000/api/v1/posts?page=1
@@ -16,7 +16,6 @@
 	2. currently the text search is only active on the post message itself, next up is adding 
 	a text cursor to the comment section, as often thats where names are mentioned.
 	3. update with changes in uchicago crushes. currently is one use only, need to implement updating
-		* related: fix fetchposts so doesn't end in error...
 	4. caching so every req doesn't hit mongo. 
 	5. auto-suggest recent searches with redis?
 	6. single post API with live fetching of likes and comments from fb

@@ -33,10 +33,7 @@ def getPosts(**kwargs):
 	graph = facebook.GraphAPI(oauth_token)
 	posts = graph.get_connections("UChicagoCrushes", "posts", **kwargs)
 	posts_data = posts['data']
-	try: 
-		paging_data = posts['paging']
-	except KeyError, e:
-		raise StandardError("Parsing Complete")
+	
 	processed_posts = []
 	print 'processing posts'
 	for p in posts_data:
@@ -46,16 +43,50 @@ def getPosts(**kwargs):
 			processed_posts.append(pst)
 		except Exception, e:
 			pass
-			
-	return processed_posts, paging_data
+	try: 
+		paging_data = posts['paging']
+		return processed_posts, paging_data
+	except KeyError, e:
+		print "Fetching Complete"
+		return processed_posts, False
+	
 
-def parse_paging(paging):
+def pg_next(paging):
 	try:
 		nxt = paging['next']
 		until = nxt.partition("&until=")
 		return until[2]
-	except KeyError, e:
+
+	except Exception, e:
 		return False
+
+def pg_prev(paging):
+	try:
+		nxt = paging['previous']
+		since = nxt.partition("&since=")
+		since = since[2].partition("&")
+		return since[0]
+
+	except Exception, e:
+		return False
+
+def update_posts(time): 
+	with app.app_context():
+		def proc(post):
+			return vars(post)
+
+		posts, paging = getPosts(limit=250, since=time)
+		unt = pg_prev(paging)
+		mongo.db.posts.insert(map(proc,posts))
+		cond = True
+		while cond:
+			sleep(rand.random())
+			posts, paging = getPosts(limit=250, since=unt)
+			unt = pg_prev(paging)
+			if unt and posts:
+				mongo.db.posts.insert(map(proc,posts))
+			else: 
+				cond = False
 
 
 def curate_posts():
@@ -64,15 +95,14 @@ def curate_posts():
 			return vars(post)
 
 		posts, paging = getPosts(limit=250)
-		unt = parse_paging(paging)
+		unt = pg_next(paging)
 		mongo.db.posts.insert(map(proc,posts))
 		cond = True
 		while cond:
 			sleep(rand.random())
 			posts, paging = getPosts(limit=250, until=unt)
-			unt = parse_paging(paging)
-			if unt:
+			unt = pg_next(paging)
+			if unt and posts:
 				mongo.db.posts.insert(map(proc,posts))
 			else: 
-				mongo.db.posts.insert(map(proc,posts))
 				cond = False
