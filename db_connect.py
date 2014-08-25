@@ -9,10 +9,10 @@ def connect():
 	if MONGO_URL:
 	  # Get the database
 	  mongo = MongoClient(MONGO_URL)
-	  mongo = mongo[MONGO_URL.rpartition('/')[2]]
+	  crushes = mongo[MONGO_URL.rpartition('/')[2]]
 	else:
 	  # Not on an app with the MongoHQ add-on, do some localhost action
 	  mongo = MongoClient()
-	  mongo = mongo.Crushes
-	return mongo
+	  crushes = mongo.Crushes
+	return mongo, crushes
 

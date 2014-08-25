@@ -1,7 +1,7 @@
 #!flask/bin/python
 import facebook
 import requests
-from flask import Flask, jsonify, abort, make_response, request, url_for
+from flask import Flask, jsonify, abort, make_response, request, url_for, g
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 from flask.ext.pymongo import PyMongo
 from bson.json_util import dumps
@@ -13,12 +13,7 @@ from time import sleep
 import random as rand
 import db_connect
 
-
-
-
-		
-		
-
+app = Flask("Crushes")
 
 def output_json(obj, code, headers=None):
     """
@@ -71,13 +66,31 @@ def crossdomain(origin=None, methods=None, headers=None,
         return update_wrapper(wrapped_function, f)
     return decorator 
 
-app = Flask("Crushes")
+
+
+
+
+@app.errorhandler(404)
+def not_found(error):
+	return make_response(jsonify( { 'error': 'Not found' } ), 404)
+
+@app.before_request
+def before_request():
+	mongo = getattr(g, 'mongo', None)
+	db = getattr(g, 'db', None)
+	if mongo is None or db is None:
+		g.mongo, g.crushes = db_connect.connect()
+		g.db = g.crushes.posts
+
+@app.teardown_request
+def teardown_request(exception):
+	mongo = getattr(g, 'mongo', None)
+	
+
 api = Api(app)
 api.decorators = [crossdomain(origin='*', methods= ['GET',], headers=['accept', 'Content-Type'])] 
 DEFAULT_REPRESENTATIONS = {'application/json': output_json}
 api.representations = DEFAULT_REPRESENTATIONS
-mongo = db_connect.connect()
-db = mongo.posts
 
 
 def marshalPosts(posts, res, pg):
@@ -99,24 +112,24 @@ class PostsListAPI(Resource):
 		if args['page'] and args['search']:
 			page = args['page']
 			search = createSearchQuery(args['search'])
-			cursor = db.find(search)
+			cursor = g.db.find(search)
 			rescount = cursor.count()
 			posts = list(cursor.limit(25).skip((page - 1)*25).sort([('created', -1)]))
 			return marshalPosts(posts, rescount, page)
 		if args['page']:
 			page = args['page']
-			rescount = db.find().count()
-			posts = list(db.find().limit(25).skip((page - 1)*25).sort([('created', -1)]))
+			rescount = g.db.find().count()
+			posts = list(g.db.find().limit(25).skip((page - 1)*25).sort([('created', -1)]))
 			return marshalPosts(posts, rescount, page)
 		elif args['search']:
 			search = createSearchQuery(args['search'])
-			cursor = db.find(search)
-			rescount = db.find(search).count()
+			cursor = g.db.find(search)
+			rescount = g.db.find(search).count()
 			posts = list(cursor.limit(25).sort([('created',-1)]))
 			return marshalPosts(posts, rescount, 1)
 		else:
-			rescount = db.find().count()
-			posts = list(db.find().limit(25).sort([('created',-1)]))
+			rescount = g.db.find().count()
+			posts = list(g.db.find().limit(25).sort([('created',-1)]))
 			return marshalPosts(posts, rescount, 1)
 			
 
@@ -136,9 +149,6 @@ class PostAPI(Resource) :
 api.add_resource(PostsListAPI, '/api/v1/posts', endpoint = 'posts')
 api.add_resource(PostAPI, '/api/v1/posts/<id>', endpoint = 'post')
 
-@app.errorhandler(404)
-def not_found(error):
-	return make_response(jsonify( { 'error': 'Not found' } ), 404)
 
 
 

@@ -4,8 +4,8 @@ import postService
 import db_connect
 
 app = Flask("Crushes")
-mongo = db_connect.connect()
-db = mongo.posts
+mongo, crushes = db_connect.connect()
+db = crushes.posts
 
 
 def setupIndexes():

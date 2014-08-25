@@ -11,104 +11,112 @@ import random as rand
 import db_connect
 import os
 
-app = Flask("Crushes")
-mongo = db_connect.connect()
-db = mongo.posts
-CLIENT_ID = os.environ.get('fb_client_id')
-CLIENT_SECRET = os.environ.get('fb_client_secret')
-
-
 class Post(object):
-	"""docstring for Post"""
-	def __init__(self, data):
-		super(Post, self).__init__()
-		try:
-			self.message = data['message']
-			self.created = datetime.strptime(data['created_time'].partition('+')[0], '%Y-%m-%dT%X')
-			self.fb_id = data['id']
-			self.comments = data['comments']
-			self.likes = data['likes']
-		except KeyError:
-			pass
+		"""docstring for Post"""
+		def __init__(self, data):
+			super(Post, self).__init__()
+			try:
+				self.message = data['message']
+				self.created = datetime.strptime(data['created_time'].partition('+')[0], '%Y-%m-%dT%X')
+				self.fb_id = data['id']
+				self.comments = data['comments']
+				self.likes = data['likes']
+			except KeyError:
+				pass
 
+class PostService(object):
+	"""docstring for PostService"""
+	def __init__(self, test=False):
+		super(PostService, self).__init__()
+		self.app = Flask("Crushes")
+		self.mongo, self.crushes = db_connect.connect()
+		self.db = self.crushes.posts
+		self.CLIENT_ID =  "686893277993623" if test else os.environ.get('fb_client_id')
+		self.CLIENT_SECRET = "518865db69daa46de95171f00a56fc25" if test else os.environ.get('fb_client_secret')
 
-def getPosts(**kwargs):
-	print 'fetching posts'
-	oauth_token = facebook.get_app_access_token(CLIENT_ID, CLIENT_SECRET)
-	graph = facebook.GraphAPI(oauth_token)
-	posts = graph.get_connections("UChicagoCrushes", "posts", **kwargs)
-	posts_data = posts['data']
 	
-	processed_posts = []
-	print 'processing posts'
-	for p in posts_data:
-		pst = Post(p)
+
+	def authenticate(self):
+		return facebook.get_app_access_token(self.CLIENT_ID, self.CLIENT_SECRET)
+
+
+	def getPosts(self, **kwargs):
+		oauth_token = self.authenticate()
+		graph = facebook.GraphAPI(oauth_token)
+		posts = graph.get_connections("UChicagoCrushes", "posts", **kwargs)
+		posts_data = posts['data']
+		
+		processed_posts = []
+		for p in posts_data:
+			pst = Post(p)
+			try:
+				pst.message
+				processed_posts.append(pst)
+			except Exception, e:
+				pass
+		try: 
+			paging_data = posts['paging']
+			return processed_posts, paging_data
+		except KeyError, e:
+			print "Fetching Complete"
+			return processed_posts, False
+		
+
+	def pgNext(self, paging):
 		try:
-			pst.message
-			processed_posts.append(pst)
+			nxt = paging['next']
+			until = nxt.partition("&until=")
+			return until[2]
+
 		except Exception, e:
-			pass
-	try: 
-		paging_data = posts['paging']
-		return processed_posts, paging_data
-	except KeyError, e:
-		print "Fetching Complete"
-		return processed_posts, False
-	
+			return False
 
-def pg_next(paging):
-	try:
-		nxt = paging['next']
-		until = nxt.partition("&until=")
-		return until[2]
+	def pgPrev(self, paging):
+		try:
+			nxt = paging['previous']
+			since = nxt.partition("&since=")
+			since = since[2].partition("&")
+			return since[0]
 
-	except Exception, e:
-		return False
-
-def pg_prev(paging):
-	try:
-		nxt = paging['previous']
-		since = nxt.partition("&since=")
-		since = since[2].partition("&")
-		return since[0]
-
-	except Exception, e:
-		return False
-
-def update_posts(time): 
-	with app.app_context():
-		def proc(post):
-			return vars(post)
-
-		posts, paging = getPosts(limit=250, since=time)
-		unt = pg_prev(paging)
-		if posts:
-			db.insert(map(proc,posts))
-			cond = True
-			while cond:
-				sleep(rand.random())
-				posts, paging = getPosts(limit=250, since=unt)
-				unt = pg_prev(paging)
-				if unt and posts:
-					db.insert(map(proc,posts))
-				else: 
-					cond = False
+		except Exception, e:
+			return False
 
 
-def curate_posts():
-	with app.app_context():
-		def proc(post):
-			return vars(post)
+	def getPostsSince(self, time): 
+		posts, paging = self.getPosts(limit=250, since=time)
+		sin = self.pgPrev(paging)
+		return posts, sin
 
-		posts, paging = getPosts(limit=250)
-		unt = pg_next(paging)
-		db.insert(map(proc,posts))
-		cond = True
-		while cond:
-			sleep(rand.random())
-			posts, paging = getPosts(limit=250, until=unt)
-			unt = pg_next(paging)
-			if unt and posts:
-				db.insert(map(proc,posts))
-			else: 
-				cond = False
+	def getPostsUntil(self, time):
+		posts, paging = self.getPosts(limit=250, until=time)
+		unt = self.pgNext(paging)
+		return posts, unt
+
+	def updatePosts(self, time):
+		with app.app_context():
+			posts, sin = self.getPostsSince(time)
+			if posts:
+				self.db.insert(map(lambda x: vars(x),posts))
+				cond = True
+				while cond:
+					sleep(rand.random())
+					posts, sin = self.getPostsSince(sin)
+					if sin and posts:
+						self.db.insert(map(lambda x: vars(x),posts))
+					else: 
+						cond = False
+
+	def curatePosts(self):
+		with app.app_context():
+			posts, unt = self.getPostsUntil(time)
+			if posts:
+				self.db.insert(map(lambda x: vars(x),posts))
+				cond = True
+				while cond:
+					sleep(rand.random())
+					posts, unt = self.getPostsUntil(unt)
+					if unt and posts:
+						self.db.insert(map(lambda x: vars(x),posts))
+					else: 
+						cond = False
+
