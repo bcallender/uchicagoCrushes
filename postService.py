@@ -8,9 +8,11 @@ from bson.objectid import ObjectId
 from datetime import timedelta, datetime
 from time import sleep
 import random as rand
+import db_connect
 
 app = Flask("Crushes")
-mongo = PyMongo(app)
+mongo = db_connect.connect()
+db = mongo.Crushes.posts
 
 
 class Post(object):
@@ -77,16 +79,17 @@ def update_posts(time):
 
 		posts, paging = getPosts(limit=250, since=time)
 		unt = pg_prev(paging)
-		mongo.db.posts.insert(map(proc,posts))
-		cond = True
-		while cond:
-			sleep(rand.random())
-			posts, paging = getPosts(limit=250, since=unt)
-			unt = pg_prev(paging)
-			if unt and posts:
-				mongo.db.posts.insert(map(proc,posts))
-			else: 
-				cond = False
+		if posts:
+			db.insert(map(proc,posts))
+			cond = True
+			while cond:
+				sleep(rand.random())
+				posts, paging = getPosts(limit=250, since=unt)
+				unt = pg_prev(paging)
+				if unt and posts:
+					db.insert(map(proc,posts))
+				else: 
+					cond = False
 
 
 def curate_posts():
@@ -96,13 +99,13 @@ def curate_posts():
 
 		posts, paging = getPosts(limit=250)
 		unt = pg_next(paging)
-		mongo.db.posts.insert(map(proc,posts))
+		db.insert(map(proc,posts))
 		cond = True
 		while cond:
 			sleep(rand.random())
 			posts, paging = getPosts(limit=250, until=unt)
 			unt = pg_next(paging)
 			if unt and posts:
-				mongo.db.posts.insert(map(proc,posts))
+				db.insert(map(proc,posts))
 			else: 
 				cond = False

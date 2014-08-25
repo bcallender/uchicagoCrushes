@@ -20,3 +20,5 @@ def update_data():
 			date = last_updated.strftime('%s')
 			postService.update_posts(date)
 
+update_data()
+

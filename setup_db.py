@@ -1,15 +1,17 @@
 from flask import Flask, current_app
 from flask.ext.pymongo import PyMongo
-import fetchPosts
+import postService
+import db_connect
 
 app = Flask("Crushes")
-mongo = PyMongo(app)
+mongo = db_connect.connect()
+db = mongo.Crushes.posts
 
 
 def setupIndexes():
 	with app.app_context():
-		mongo.db.posts.ensure_index([("message", 'text' )], name="TextIndex")
-		mongo.db.posts.ensure_index([("created", -1), ("created", 1)])
+		db.ensure_index([("message", 'text' )], name="TextIndex")
+		db.ensure_index([("created", 1)])
 
 setupIndexes()
-fetchPosts.curate_posts()
+postService.curate_posts()

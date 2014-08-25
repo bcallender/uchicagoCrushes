@@ -11,6 +11,7 @@ from flask import current_app
 from functools import update_wrapper
 from time import sleep
 import random as rand
+import db_connect
 
 
 
@@ -73,10 +74,12 @@ def crossdomain(origin=None, methods=None, headers=None,
 app = Flask("Crushes")
 api = Api(app)
 api.decorators = [crossdomain(origin='*', methods= ['GET',], headers=['accept', 'Content-Type'])] 
-mongo = PyMongo(app)
+#mongo = PyMongo(app)
 DEFAULT_REPRESENTATIONS = {'application/json': output_json}
 api.representations = DEFAULT_REPRESENTATIONS
 #posts_collection = mongo.db.posts
+mongo = db_connect.connect()
+db = mongo.Crushes.posts
 
 
 def marshalPosts(posts, res, pg):
@@ -93,22 +96,22 @@ class PostsListAPI(Resource):
 	def get(self):
 		args = self.parser.parse_args()
 		if args['page'] and args['search']:
-			rescount = mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
-			posts = list(mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
+			rescount = db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
+			posts = list(db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
 			page = args['page']
 			return marshalPosts(posts, rescount, page)
 		if args['page']:
-			rescount = mongo.db.posts.find().count()
-			posts = list(mongo.db.posts.find().limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
+			rescount = db.find().count()
+			posts = list(db.find().limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
 			page = args['page']
 			return marshalPosts(posts, rescount, page)
 		elif args['search']:
-			rescount = mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
-			posts = list(mongo.db.posts.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).sort([('created',-1)]))
+			rescount = db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
+			posts = list(db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).sort([('created',-1)]))
 			return marshalPosts(posts, rescount, 1)
 		else:
-			rescount = mongo.db.posts.find().count()
-			posts = list(mongo.db.posts.find().limit(25).sort([('created',-1)]))
+			rescount = db.find().count()
+			posts = list(db.find().limit(25).sort([('created',-1)]))
 			return marshalPosts(posts, rescount, 1)
 			
 
