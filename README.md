@@ -5,7 +5,7 @@ Create a python virtualenv in the directory with `virtualenv env`. Then run `sou
 
 Run `python setup_db.py`, then `python init_db.py` to create the appropriate indices and fetch the latest from uchicago crushes. Make sure your mongodb is installed and running on the default port!
 
-Start the application by running foreman start (or python app.py if you dont have foreman)!
+Start the application by running foreman start (or python app.py if you dont have foreman)! Make sure to change the facebook client_id and client_secret in postService.py. 
 
 Or just go to http://murmuring-oasis-3072.herokuapp.com/api/v1/posts
 
