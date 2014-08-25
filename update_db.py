@@ -9,10 +9,14 @@ from datetime import timedelta, datetime
 from time import sleep
 import random as rand
 import postService
+import db_connect
 from dateutil import parser 
 
 app = Flask("Crushes")
+mongo = db_connect.connect()
+
 db = mongo.posts
+
 
 def update_data():
 	with app.app_context():
