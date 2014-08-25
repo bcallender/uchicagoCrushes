@@ -12,7 +12,6 @@ import postService
 from dateutil import parser 
 
 app = Flask("Crushes")
-mongo = PyMongo(app)
 
 def update_data():
 	with app.app_context():

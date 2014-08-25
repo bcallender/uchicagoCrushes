@@ -79,7 +79,7 @@ DEFAULT_REPRESENTATIONS = {'application/json': output_json}
 api.representations = DEFAULT_REPRESENTATIONS
 #posts_collection = mongo.db.posts
 mongo = db_connect.connect()
-db = mongo.Crushes.posts
+db = mongo.posts
 
 
 def marshalPosts(posts, res, pg):

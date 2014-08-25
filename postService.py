@@ -12,7 +12,7 @@ import db_connect
 
 app = Flask("Crushes")
 mongo = db_connect.connect()
-db = mongo.Crushes.posts
+db = mongo.posts
 
 
 class Post(object):
