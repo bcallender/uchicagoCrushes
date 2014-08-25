@@ -9,12 +9,19 @@ Start the application by running foreman start (or python app.py if you dont hav
 
 Or just go to http://murmuring-oasis-3072.herokuapp.com/api/v1/posts
 
+## Are there tests?
+
+...a couple. well, one.
+
+`python app_test.py`
+
 ##Endpoint is localhost:5000/api/v1/posts
 	1. pagination: localhost:5000/api/v1/posts?page=1
 	2. search: localhost:5000/api/v1/posts?search=Love
 	3. paginated search: localhost:5000/api/v1/posts?search=Love&page=4
 
 ##Next features:
+	0. tests
 	1. ...a front end
 	2. currently the text search is only active on the post message itself, next up is adding 
 	a text cursor to the comment section, as often thats where names are mentioned.
