@@ -8,7 +8,7 @@ def connect():
 	 
 	if MONGO_URL:
 	  # Get the database
-	  mongo = MongoClient('mongodb://admin:4sc11c0d3@mongohq@kahana.mongohq.com:10027/app28752506')
+	  mongo = MongoClient('mongodb://admin:testpwd@kahana.mongohq.com:10027/app28752506')
 	else:
 	  # Not on an app with the MongoHQ add-on, do some localhost action
 	  mongo = MongoClient()
