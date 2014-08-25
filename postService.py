@@ -93,7 +93,7 @@ class PostService(object):
 		return posts, unt
 
 	def updatePosts(self, time):
-		with app.app_context():
+		with self.app.app_context():
 			posts, sin = self.getPostsSince(time)
 			if posts:
 				self.db.insert(map(lambda x: vars(x),posts))
@@ -107,7 +107,7 @@ class PostService(object):
 						cond = False
 
 	def curatePosts(self):
-		with app.app_context():
+		with self.app.app_context():
 			posts, unt = self.getPostsUntil(time)
 			if posts:
 				self.db.insert(map(lambda x: vars(x),posts))

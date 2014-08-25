@@ -16,7 +16,7 @@ def update_data():
 			last_updated = list(db.find().sort([('created', -1)]).limit(1))[0]['created']
 			date = last_updated.strftime('%s')
 			ps = PostService()
-			ps.update_posts(date)
+			ps.updatePosts(date)
 
 update_data()
 
