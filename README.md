@@ -15,7 +15,7 @@ Or just go to http://murmuring-oasis-3072.herokuapp.com/api/v1/posts
 
 `python app_test.py`
 
-##Endpoint is localhost:5000/api/v1/posts
+##Endpoint is /api/v1/posts
 	1. pagination: localhost:5000/api/v1/posts?page=1
 	2. search: localhost:5000/api/v1/posts?search=Love
 	3. paginated search: localhost:5000/api/v1/posts?search=Love&page=4
