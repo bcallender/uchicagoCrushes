@@ -1,16 +1,9 @@
-import facebook
-import requests
-from flask import Flask, jsonify, abort, make_response, request, url_for, current_app
-
+from flask import Flask, current_app
 from flask.ext.pymongo import PyMongo
-from bson.json_util import dumps
-from bson.objectid import ObjectId
 from datetime import timedelta, datetime
-from time import sleep
-import random as rand
+
 import postService
 import db_connect
-from dateutil import parser 
 
 app = Flask("Crushes")
 mongo = db_connect.connect()
