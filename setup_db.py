@@ -13,5 +13,5 @@ def setupIndexes():
 		db.ensure_index([("message", 'text' )], name="TextIndex")
 		db.ensure_index([("created", 1)])
 
-#setupIndexes()
+setupIndexes()
 postService.curate_posts()
