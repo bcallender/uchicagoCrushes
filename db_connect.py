@@ -4,7 +4,7 @@ from urlparse import urlparse
 
 
 def connect():
-	MONGO_URL = os.environ.get('MONGOLAB_URI')
+	MONGO_URL = os.environ.get('MONGOHQ_URL')
 	 
 	if MONGO_URL:
 	  # Get the database
