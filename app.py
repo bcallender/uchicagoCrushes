@@ -28,7 +28,7 @@ def output_json(obj, code, headers=None):
     resp = make_response(dumps(obj), code)
     resp.headers.extend(headers or {})
     return resp
-
+#CORS setup
 def crossdomain(origin=None, methods=None, headers=None,
                 max_age=21600, attach_to_all=True,
                 automatic_options=True):
@@ -74,16 +74,17 @@ def crossdomain(origin=None, methods=None, headers=None,
 app = Flask("Crushes")
 api = Api(app)
 api.decorators = [crossdomain(origin='*', methods= ['GET',], headers=['accept', 'Content-Type'])] 
-#mongo = PyMongo(app)
 DEFAULT_REPRESENTATIONS = {'application/json': output_json}
 api.representations = DEFAULT_REPRESENTATIONS
-#posts_collection = mongo.db.posts
 mongo = db_connect.connect()
 db = mongo.posts
 
 
 def marshalPosts(posts, res, pg):
 	return [{'posts':posts}, {'total_results': res}, {'page': pg}]
+
+def createSearchQuery(search):
+	return {'$text': {'$search': "\"" + search + "\""}}
 
 
 class PostsListAPI(Resource):
@@ -96,18 +97,22 @@ class PostsListAPI(Resource):
 	def get(self):
 		args = self.parser.parse_args()
 		if args['page'] and args['search']:
-			rescount = db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
-			posts = list(db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
 			page = args['page']
+			search = createSearchQuery(args['search'])
+			cursor = db.find(search)
+			rescount = cursor.count()
+			posts = list(cursor.limit(25).skip((page - 1)*25).sort([('created', -1)]))
 			return marshalPosts(posts, rescount, page)
 		if args['page']:
-			rescount = db.find().count()
-			posts = list(db.find().limit(25).skip((args['page'] - 1)*25).sort([('created', -1)]))
 			page = args['page']
+			rescount = db.find().count()
+			posts = list(db.find().limit(25).skip((page - 1)*25).sort([('created', -1)]))
 			return marshalPosts(posts, rescount, page)
 		elif args['search']:
-			rescount = db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).count()
-			posts = list(db.find({'$text': {'$search': "\"" + args['search'] + "\""}}).limit(25).sort([('created',-1)]))
+			search = createSearchQuery(args['search'])
+			cursor = db.find(search)
+			rescount = db.find(search).count()
+			posts = list(cursor.limit(25).sort([('created',-1)]))
 			return marshalPosts(posts, rescount, 1)
 		else:
 			rescount = db.find().count()
@@ -118,19 +123,18 @@ class PostsListAPI(Resource):
 
 		
 
-# class PostAPI(Resource) :
-# 	#decorators = [auth.login_required]
+class PostAPI(Resource) :
 
-#  	def __init__(self):
-# 		super(Post, self).__init__()
-# 	def get(self, id):
-# 		post = mongo.db.posts.find_one({"_id": ObjectId(id)})
-# 		if not post :
-# 			abort(404)
-# 		return { 'post' : post}
+ 	def __init__(self):
+		super(PostAPI, self).__init__()
+	def get(self, id):
+		post = db.find_one({"_id": ObjectId(id)})
+		if not post :
+			abort(404)
+		return { 'post' : post}
 
 api.add_resource(PostsListAPI, '/api/v1/posts', endpoint = 'posts')
-# api.add_resource(PostAPI, '/api/v1/posts/<id>', endpoint = 'post')
+api.add_resource(PostAPI, '/api/v1/posts/<id>', endpoint = 'post')
 
 @app.errorhandler(404)
 def not_found(error):

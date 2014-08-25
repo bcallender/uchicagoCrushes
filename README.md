@@ -1,3 +1,4 @@
+
 ## Super quick and dirty API for UChicago Crushes that allows searching. 
 
 Create a python virtualenv in the directory with `virtualenv env`. Then run `source env/bin/activate` then `pip install -r requirements.txt` to install requirements. 
