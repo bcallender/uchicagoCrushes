@@ -9,10 +9,13 @@ from datetime import timedelta, datetime
 from time import sleep
 import random as rand
 import db_connect
+import os
 
 app = Flask("Crushes")
 mongo = db_connect.connect()
 db = mongo.posts
+CLIENT_ID = os.environ.get('fb_client_id')
+CLIENT_SECRET = os.environ.get('fb_client_secret')
 
 
 class Post(object):
@@ -31,7 +34,7 @@ class Post(object):
 
 def getPosts(**kwargs):
 	print 'fetching posts'
-	oauth_token = facebook.get_app_access_token('686893277993623', '518865db69daa46de95171f00a56fc25')
+	oauth_token = facebook.get_app_access_token(CLIENT_ID, CLIENT_SECRET)
 	graph = facebook.GraphAPI(oauth_token)
 	posts = graph.get_connections("UChicagoCrushes", "posts", **kwargs)
 	posts_data = posts['data']
