@@ -1,0 +1,1 @@
+postService.curate_posts()
