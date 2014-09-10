@@ -1,7 +1,7 @@
 #!flask/bin/python
 import facebook
 import requests
-from flask import Flask, jsonify, abort, make_response, request, url_for, g
+from flask import Flask, jsonify, abort, make_response, request, url_for, g, render_template
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 from flask.ext.pymongo import PyMongo
 from bson.json_util import dumps
@@ -64,7 +64,7 @@ def crossdomain(origin=None, methods=None, headers=None,
         f.provide_automatic_options = False
         f.required_methods = ['OPTIONS']
         return update_wrapper(wrapped_function, f)
-    return decorator 
+    return decorator
 
 
 
@@ -85,10 +85,10 @@ def before_request():
 @app.teardown_request
 def teardown_request(exception):
 	mongo = getattr(g, 'mongo', None)
-	
+
 
 api = Api(app)
-api.decorators = [crossdomain(origin='*', methods= ['GET',], headers=['accept', 'Content-Type'])] 
+api.decorators = [crossdomain(origin='*', methods= ['GET',], headers=['accept', 'Content-Type'])]
 DEFAULT_REPRESENTATIONS = {'application/json': output_json}
 api.representations = DEFAULT_REPRESENTATIONS
 
@@ -131,10 +131,10 @@ class PostsListAPI(Resource):
 			rescount = g.db.find().count()
 			posts = list(g.db.find().limit(25).sort([('created',-1)]))
 			return marshalPosts(posts, rescount, 1)
-			
 
 
-		
+
+
 
 class PostAPI(Resource) :
 
@@ -153,9 +153,5 @@ api.add_resource(PostAPI, '/api/v1/posts/<id>', endpoint = 'post')
 
 
 
-
 if __name__ == '__main__':
     app.run(debug = True)
-
-		
-

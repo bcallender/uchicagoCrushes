@@ -15,7 +15,7 @@ def update_data():
 	with app.app_context():
 			last_updated = list(db.find().sort([('created', -1)]).limit(1))[0]['created']
 			date = last_updated.strftime('%s')
-			ps = PostService()
+			ps = PostService(True)
 			ps.updatePosts(date)
 
 update_data()
